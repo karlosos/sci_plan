@@ -11,8 +11,8 @@ ini_set('max_execution_time', 1800); //300 seconds = 5 minutes
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require 'ScheduleManager.php';
-$backend = new Backend();
-$backend->getData();
+$backend = new ScheduleManager();
+$backend->updateAllData();
 
 
 error_reporting(E_ALL);

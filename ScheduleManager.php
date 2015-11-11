@@ -3,14 +3,48 @@ require 'simple_html_dom.php';
 require 'rb.php';
 R::setup('mysql:host=localhost;dbname=plan', 'root', 'osiem');
 ini_set('max_execution_time', 300); //300 seconds = 5 minutes
-Class Backend {
-    private $godzny = array();
+
+/**
+ * Class for updating schedule database
+ */
+Class ScheduleManager {
     
-    function setGodzny($godzny) {
-        $this->godzny = $godzny;
+    /**
+     * Member to store list of hours
+     * @var array
+     */
+    private $hours_list = array();
+    
+    /**
+     * Member to store list of schedules
+     * @var array
+     */
+    private $schedules_list = array();
+      
+    public function updateAllData() {
+        R::wipe('plan');
+        
+        $this->updateTeachersList($this->downloadSchedulesList(1));
+        $this->updateRoomList($this->downloadSchedulesList(2));
+        $klasy = $this->downloadSchedulesList(0);
+        foreach ($this->downloadSchedulesList(0) as $klasa) {
+            $this->updateClassSchedule($klasa[0]);
+        }
     }
-        private function getList($i) {
+    
+    /**
+     * Download list such as classes, classrooms and teachers
+     * 
+     * Classes type 0
+     * Teachers typ 1
+     * Classrooms type 2
+     * 
+     * @param int $i list type
+     * @return list of specified type
+     */
+    private function downloadSchedulesList($i) {
         $html = file_get_html('http://www.sci.edu.pl/plan/lista.html');
+
         $list = array();
         $ul = $html->find('ul', $i);
         foreach ($ul->find('li') as $li) {
@@ -18,11 +52,14 @@ Class Backend {
             $a = $li->find('a', 0);
             $row[] = "http://www.sci.edu.pl/plan/" . $a->href;
             $row[] = $a->plaintext;
+
             $list[] = $row;
         }
+        $this->schedules_list = $list;
         return $list;
     }
-    public function listaNauczycieli($array) {
+    
+    private function updateTeachersList($array) {
         R::wipe('nauczyciele');
         
         //print_r($array);
@@ -45,7 +82,7 @@ Class Backend {
         }
     }
     
-    public function godziny($example) {
+    private function updateHoursList($example) {
         $html = file_get_html($example);
         $plan = $html->find('.tabela', 0);
         $godzinya = array();
@@ -90,11 +127,7 @@ Class Backend {
                     
                     $godzinya[] = $godzina;
           }
-          
-      echo '<br>------------------------------------- <br>';
-       print_r($godzinya);
-       echo '<br>------------------------------------- <br>';
-       
+                
        R::wipe('godziny');
        foreach($godzinya as $i) {
             R::useWriterCache(true);
@@ -106,10 +139,10 @@ Class Backend {
             
             $id = R::store($godzina);
        }
-       $this->setGodzny($godzinya);
+       $this->setHoursList($godzinya);
     }
     
-    public function listaSal($array) {
+    private function updateRoomList($array) {
         R::wipe('sale');
         
         //print_r($array);
@@ -132,17 +165,7 @@ Class Backend {
         }
     }
     
-    public function getData() {
-        R::wipe('plan');
-        
-        $this->listaNauczycieli($this->getList(1));
-        $this->listaSal($this->getList(2));
-        $klasy = $this->getList(0);
-        foreach ($this->getList(0) as $klasa) {
-            $this->parseKlasa($klasa[0]);
-        }
-    }
-    private function dodajWiersz($klasa, $dzien, $godzina, $nauczyciel, $przedmiot, $sala) {
+    private function putScheduleRow($klasa, $dzien, $godzina, $nauczyciel, $przedmiot, $sala) {
         R::useWriterCache(true);
         
         $wiersz = R::dispense('plan');
@@ -156,7 +179,8 @@ Class Backend {
         } 
         $id = R::store($wiersz);
     }
-    private function parseKlasa($link) {
+    
+    private function updateClassSchedule($link) {
         echo $link;
         $html = file_get_html($link);
         $plan = $html->find('.tabela', 0);
@@ -180,16 +204,20 @@ Class Backend {
                         $sala = substr($sala, 0, strlen($sala) - 5);
                         $nauczyciel = substr($nauczyciel, 1);
                         $sala = substr($sala, 1);
-                        $this->dodajWiersz($klasa, $dzien, $godzina, $nauczyciel, $przedmiot, $sala);
+                        $this->putScheduleRow($klasa, $dzien, $godzina, $nauczyciel, $przedmiot, $sala);
                     } else {
-                        $this->dodajWiersz($klasa, $dzien, $godzina, '', '', '');
+                        $this->putScheduleRow($klasa, $dzien, $godzina, '', '', '');
                     }
                     
-                    if($i == 11 && empty($this->godzny)) {
-                        $this->godziny($link);
+                    if($i == 11 && empty($this->hours_list)) {
+                        $this->updateHoursList($link);
                     }
             }
             }
         }
+    }
+    
+    private function setHoursList($godzny) {
+        $this->hours_list = $godzny;
     }
 }

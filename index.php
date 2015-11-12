@@ -1,23 +1,15 @@
 <?php
-/*
-require 'rb.php';
-error_reporting(E_ALL);
+require_once 'db_connect.php';
 
-R::setup('mysql:host=localhost;dbname=plan', 'root', 'osiem');
-ini_set('max_execution_time', 1800); //300 seconds = 5 minutes
-*/
 // Aktualizacja danych
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+/*
 require 'ScheduleManager.php';
 $backend = new ScheduleManager();
 $backend->updateAllData();
+*/
 
-
-error_reporting(E_ALL);
-
-$plan = R::getAll( 'SELECT * FROM plan WHERE klasa = 1' );
+// Przykladowe wyswietlanie planu dla klasy 4C
+$plan = R::getAll( 'SELECT * FROM plan WHERE klasa = 12' );
 
 echo '<table>';
 foreach ($plan as $lekcja) {

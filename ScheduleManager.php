@@ -196,28 +196,56 @@ Class ScheduleManager {
         $class = substr($class, 34);
         $class = substr($class, 0, strlen($class) - 5);
         $array = array();
-        for ($i = 1; $i <= 11; $i++) {
-            for ($j = 2; $j < 7; $j++) {
+        for ($hour_index = 1; $hour_index <= 11; $hour_index++) {
+            for ($day_index = 2; $day_index < 7; $day_index++) {
                 $row = array();
-                if($schedule->find('tr', $i)) {
-                    $td = $schedule->find('tr', $i)->find('td', $j);
-                    $day = $j - 1;
-                    $hour = $i - 1;
+                if($schedule->find('tr', $hour_index)) {
+                    $td = $schedule->find('tr', $hour_index)->find('td', $day_index);
+                    $day = $day_index - 1;
+                    $hour = $hour_index - 1;
                     if ($td->find('span', 0)) {
-                        $subject = $td->find('span', 0)->plaintext;
-                        $teacher = $td->find('a', 0)->href;
-                        if($td->find('a', 1))
-                            $sala = $td->find('a', 1)->href;
-                        $teacher = substr($teacher, 0, strlen($teacher) - 5);
-                        $sala = substr($sala, 0, strlen($sala) - 5);
-                        $teacher = substr($teacher, 1);
-                        $sala = substr($sala, 1);
-                        $this->putScheduleRow($class, $day, $hour, $teacher, $subject, $sala);
+                        
+                        // If span in span (two lessons in one hour)
+                        if($td->find('span', 0)->find('span', 0)) {
+                            $subject = $td->find('span', 0)->find('span', 0)->plaintext;
+                            $teacher = $td->find('span', 0)->find('a', 0)->href;
+                            if($td->find('span', 0)->find('a', 1))
+                                $sala = $td->find('a', 1)->href;
+                            $teacher = substr($teacher, 0, strlen($teacher) - 5);
+                            $sala = substr($sala, 0, strlen($sala) - 5);
+                            $teacher = substr($teacher, 1);
+                            $sala = substr($sala, 1);
+                            $this->putScheduleRow($class, $day, $hour, $teacher, $subject, $sala);
+                            
+                            $test_second_lesson = $td->find('span', 1)->find('span', 0)->plaintext;
+                            $test_anchor = 1;
+                            if($td->find('span', 1)->find('span', 0)) {
+                                $subject = $td->find('span', 1)->find('span', 0)->plaintext;
+                                $teacher = $td->find('span', 1)->find('a', 0)->href;
+                                if($td->find('span', 1)->find('a', 1))
+                                    $sala = $td->find('a', 1)->href;
+                                $teacher = substr($teacher, 0, strlen($teacher) - 5);
+                                $sala = substr($sala, 0, strlen($sala) - 5);
+                                $teacher = substr($teacher, 1);
+                                $sala = substr($sala, 1);
+                                $this->putScheduleRow($class, $day, $hour, $teacher, $subject, $sala);
+                            }
+                        } else {                          
+                            $subject = $td->find('span', 0)->plaintext;
+                            $teacher = $td->find('a', 0)->href;
+                            if($td->find('a', 1))
+                                $sala = $td->find('a', 1)->href;
+                            $teacher = substr($teacher, 0, strlen($teacher) - 5);
+                            $sala = substr($sala, 0, strlen($sala) - 5);
+                            $teacher = substr($teacher, 1);
+                            $sala = substr($sala, 1);
+                            $this->putScheduleRow($class, $day, $hour, $teacher, $subject, $sala);
+                        }
                     } else {
                         $this->putScheduleRow($class, $day, $hour, '', '', '');
                     }
                     
-                    if($i == 11 && empty($this->hours_list)) {
+                    if($hour_index == 11 && empty($this->hours_list)) {
                         $this->updateHoursList($link);
                     }
             }

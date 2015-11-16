@@ -10,7 +10,7 @@ $backend->updateAllData();
 */
 
 // Przykladowe wyswietlanie planu dla klasy 4C
-$plan = R::getAll( 'SELECT * FROM plan WHERE klasa = 12 ORDER BY godzina ASC, dzien ASC' );
+$plan = R::getAll( 'SELECT * FROM plan WHERE klasa = 4 ORDER BY godzina ASC, dzien ASC' );
 $godziny = R::getAll( 'SELECT * FROM godziny' );
 $nauczyciele = R::getAll( 'SELECT * FROM nauczyciele' );
 $sale = R::getAll( 'SELECT * FROM sale' );
@@ -66,7 +66,6 @@ foreach ($plan as $lekcja) {
 }
 
 // Przykladowe wyswietlanie planu dla nauczyciela 19
-$plan = R::getAll( 'SELECT * FROM plan WHERE nauczyciel = 6 ORDER BY godzina ASC, dzien ASC' );
 $godziny = R::getAll( 'SELECT * FROM godziny' );
 $nauczyciele = R::getAll( 'SELECT * FROM nauczyciele' );
 $sale = R::getAll( 'SELECT * FROM sale' );
@@ -83,40 +82,37 @@ echo "<th>Piątek</th>";
 echo "</tr>";
 echo "</thead>";
 
-$hour_index = 0;   
-foreach ($plan as $lekcja) {
-
-    if($lekcja['dzien'] == '1') {
-        echo '<tr>';
-        echo '<td class="hour">';
-        $hour = $godziny[$hour_index];
-        echo $hour['start']."-".$hour['stop'];
-        echo '</td>';
-        $hour_index += 1;
-    }
-    
-    echo '<td ckass="lesson">';
-        echo $lekcja['przedmiot'];
-        
-        $klasa_id = $lekcja['klasa'];
-        if($klasa_id != "") {
-            echo '<a class="nauczyciel">'.$klasa.'</a>';
-        }
-        
-        $sala_id = $lekcja['sala'];
-        if($sala_id != "") {
-            $sala = R::getAll( "SELECT * FROM sale WHERE legacy_id = $sala_id" );
-            $sala_skrot =  $sala[0]['skrot'];
-            
-            $sala_skrot = substr($sala_skrot, 0, 2);
-            echo '<a class="sala">'.$sala_skrot."</a>";
-        }
-        //$lekcja['nauczyciel'];
-        //echo $nauczyciele[(int)$lekcja['nauczyciel']]['skrot'];
+$hour_index = 0;  
+for ($j = 0; $j<10; $j++) {
+    echo '<tr>';
+    echo '<td class="hour">';
+    $hour = $godziny[$j];
+    echo $hour['start']."-".$hour['stop'];
     echo '</td>';
-    
-    if($lekcja['dzien'] == '5') {
-        echo '</tr>';
+    for ($i = 1; $i < 6; $i++) {
+        echo "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND nauczyciel = 17";
+        $lekcja = R::getAll( "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND nauczyciel = 17" );
+        echo '<td ckass="lesson">';
+        
+                $klasa_id = $lekcja[0]['klasa'];
+                echo '<a class="klasa">'.$klasa_id.'</a>';
+                
+                echo $lekcja[0]['przedmiot'];
+
+                
+
+                $sala_id = $lekcja[0]['sala'];
+                if($sala_id != "") {
+                    $sala = R::getAll( "SELECT * FROM sale WHERE legacy_id = $sala_id" );
+                    $sala_skrot =  $sala[0]['skrot'];
+
+                    $sala_skrot = substr($sala_skrot, 0, 2);
+                    echo '<a class="sala">'.$sala_skrot."</a>";
+                }
+                //$lekcja['nauczyciel'];
+                //echo $nauczyciele[(int)$lekcja['nauczyciel']]['skrot'];
+        echo '</td>';
     }
+    echo '</tr>';
 }
 echo '</table>';

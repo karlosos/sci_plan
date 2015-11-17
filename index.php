@@ -90,7 +90,7 @@ for ($j = 0; $j<10; $j++) {
     echo $hour['start']."-".$hour['stop'];
     echo '</td>';
     for ($i = 1; $i < 6; $i++) {
-        echo "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND nauczyciel = 17";
+        //echo "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND nauczyciel = 17";
         $lekcja = R::getAll( "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND nauczyciel = 17" );
         echo '<td ckass="lesson">';
         
@@ -100,6 +100,59 @@ for ($j = 0; $j<10; $j++) {
                 echo $lekcja[0]['przedmiot'];
 
                 
+
+                $sala_id = $lekcja[0]['sala'];
+                if($sala_id != "") {
+                    $sala = R::getAll( "SELECT * FROM sale WHERE legacy_id = $sala_id" );
+                    $sala_skrot =  $sala[0]['skrot'];
+
+                    $sala_skrot = substr($sala_skrot, 0, 2);
+                    echo '<a class="sala">'.$sala_skrot."</a>";
+                }
+                //$lekcja['nauczyciel'];
+                //echo $nauczyciele[(int)$lekcja['nauczyciel']]['skrot'];
+        echo '</td>';
+    }
+    echo '</tr>';
+}
+echo '</table>';
+
+
+// Przykladowe wyswietlanie planu dla sali 3
+$godziny = R::getAll( 'SELECT * FROM godziny' );
+$nauczyciele = R::getAll( 'SELECT * FROM nauczyciele' );
+$sale = R::getAll( 'SELECT * FROM sale' );
+
+echo '<table>';
+echo "<thead>";
+echo "<tr>";
+echo "<th>godzina</th>";
+echo "<th>Poniedziałek</th>";
+echo "<th>Wtorek</th>";
+echo "<th>Środa</th>";
+echo "<th>Czwartek</th>";
+echo "<th>Piątek</th>";
+echo "</tr>";
+echo "</thead>";
+
+$hour_index = 0;  
+for ($j = 0; $j<10; $j++) {
+    echo '<tr>';
+    echo '<td class="hour">';
+    $hour = $godziny[$j];
+    echo $hour['start']."-".$hour['stop'];
+    echo '</td>';
+    for ($i = 1; $i < 6; $i++) {
+        //echo "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND sala = 3";
+        $lekcja = R::getAll( "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND sala = 3" );
+        echo '<td ckass="lesson">';
+        
+                $klasa_id = $lekcja[0]['klasa'];
+                echo '<a class="klasa">'.$klasa_id.'</a>';
+                
+                echo $lekcja[0]['przedmiot'];
+
+                echo '<a class="nauczyciel">'.$lekcja[0]['nauczyciel'].'</a>';;
 
                 $sala_id = $lekcja[0]['sala'];
                 if($sala_id != "") {

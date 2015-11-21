@@ -6,6 +6,10 @@ require_once 'db_connect.php';
  */
 Class ScheduleController {
     
+    /**
+     * Generating html output for Class Schedule
+     * @param type $class_id
+     */
     public function getClassSchedule($class_id) {
         // Przykladowe wyswietlanie planu dla klasy 4C
         $plan = R::getAll( "SELECT * FROM plan WHERE klasa = $class_id ORDER BY godzina ASC, dzien ASC" );
@@ -65,6 +69,10 @@ Class ScheduleController {
         
     }
     
+    /**
+     * Generate html output for teachers schedule
+     * @param type $teacher_id
+     */
     public function getTeacherSchedule($teacher_id) {
     // Przykladowe wyswietlanie planu dla nauczyciela 19
         $godziny = R::getAll( 'SELECT * FROM godziny' );
@@ -120,6 +128,10 @@ Class ScheduleController {
         
     }
     
+    /**
+     * Generate html output for classrom schedule
+     * @param type $classroom_id
+     */
     public function getClassroomSchedule($classroom_id) {   
         // Przykladowe wyswietlanie planu dla sali 3
         $godziny = R::getAll( 'SELECT * FROM godziny' );
@@ -172,5 +184,26 @@ Class ScheduleController {
             echo '</tr>';
         }
         echo '</table>';        
+    }
+    
+    public function getTeacherList() {
+        $nauczyciele = R::getAll( 'SELECT * FROM nauczyciele' );
+        foreach ($nauczyciele as $nauczyciel) {
+            echo "<a href='?type=teacher&id=".$nauczyciel['legacy_id']."'>".$nauczyciel['skrot']."</a><br>";
+        }
+    }
+    
+    public function getClassList() {
+        $klasy = R::getAll( 'SELECT * FROM klasy' );
+        foreach ($klasy as $klasa) {
+            echo "<a href='?type=class&id=".$klasa['id']."'>".$klasa['nazwa']."</a><br>";
+        }
+    }
+    
+    public function getClassroomList() {
+        $klasy = R::getAll( 'SELECT * FROM sale' );
+        foreach ($klasy as $klasa) {
+            echo "<a href='?type=classroom&id=".$klasa['legacy_id']."'>".$klasa['skrot']."</a><br>";
+        }
     }
 }

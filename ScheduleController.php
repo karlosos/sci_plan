@@ -12,10 +12,10 @@ Class ScheduleController {
      */
     public function getClassSchedule($class_id) {
         // Przykladowe wyswietlanie planu dla klasy 4C
-        $plan = R::getAll( "SELECT * FROM plan WHERE klasa = $class_id ORDER BY godzina ASC, dzien ASC" );
-        $godziny = R::getAll( 'SELECT * FROM godziny' );
-        $nauczyciele = R::getAll( 'SELECT * FROM nauczyciele' );
-        $sale = R::getAll( 'SELECT * FROM sale' );
+        $schedule = R::getAll( "SELECT * FROM plan WHERE klasa = $class_id ORDER BY godzina ASC, dzien ASC" );
+        $hours = R::getAll( 'SELECT * FROM godziny' );
+        $teachers = R::getAll( 'SELECT * FROM nauczyciele' );
+        $classrooms = R::getAll( 'SELECT * FROM sale' );
         
         echo '<table>';
         echo "<thead>";
@@ -30,39 +30,39 @@ Class ScheduleController {
         echo "</thead>";
 
         $hour_index = 0;   
-        foreach ($plan as $lekcja) {
+        foreach ($schedule as $lesson) {
 
-            if($lekcja['dzien'] == '1') {
+            if($lesson['dzien'] == '1') {
                 echo '<tr>';
                 echo '<td class="hour">';
-                $hour = $godziny[$hour_index];
+                $hour = $hours[$hour_index];
                 echo $hour['start']."-".$hour['stop'];
                 echo '</td>';
                 $hour_index += 1;
             }
 
             echo '<td ckass="lesson">';
-                echo $lekcja['przedmiot'];
+                echo $lesson['przedmiot'];
 
-                $nauczyciel_id = $lekcja['nauczyciel'];
-                if($nauczyciel_id != "") {
-                    $nauczyciel = R::getAll( "SELECT * FROM nauczyciele WHERE legacy_id = $nauczyciel_id" );
-                    echo '<a class="nauczyciel">'.$nauczyciel[0]['skrot'].'</a>';
+                $teacher_id = $lesson['nauczyciel'];
+                if($teacher_id != "") {
+                    $teacher = R::getAll( "SELECT * FROM nauczyciele WHERE legacy_id = $teacher_id" );
+                    echo '<a class="nauczyciel">'.$teacher[0]['skrot'].'</a>';
                 }
 
-                $sala_id = $lekcja['sala'];
-                if($sala_id != "") {
-                    $sala = R::getAll( "SELECT * FROM sale WHERE legacy_id = $sala_id" );
-                    $sala_skrot =  $sala[0]['skrot'];
+                $teacher_id = $lesson['sala'];
+                if($teacher_id != "") {
+                    $classroom = R::getAll( "SELECT * FROM sale WHERE legacy_id = $teacher_id" );
+                    $classroom_short =  $classroom[0]['skrot'];
 
-                    $sala_skrot = substr($sala_skrot, 0, 2);
-                    echo '<a class="sala">'.$sala_skrot."</a>";
+                    $classroom_short = substr($classroom_short, 0, 2);
+                    echo '<a class="sala">'.$classroom_short."</a>";
                 }
                 //$lekcja['nauczyciel'];
                 //echo $nauczyciele[(int)$lekcja['nauczyciel']]['skrot'];
             echo '</td>';
 
-            if($lekcja['dzien'] == '5') {
+            if($lesson['dzien'] == '5') {
                 echo '</tr>';
             }
         }
@@ -75,9 +75,9 @@ Class ScheduleController {
      */
     public function getTeacherSchedule($teacher_id) {
     // Przykladowe wyswietlanie planu dla nauczyciela 19
-        $godziny = R::getAll( 'SELECT * FROM godziny' );
-        $nauczyciele = R::getAll( 'SELECT * FROM nauczyciele' );
-        $sale = R::getAll( 'SELECT * FROM sale' );
+        $hours = R::getAll( 'SELECT * FROM godziny' );
+        $teachers = R::getAll( 'SELECT * FROM nauczyciele' );
+        $classrooms = R::getAll( 'SELECT * FROM sale' );
 
         echo '<table>';
         echo "<thead>";
@@ -95,28 +95,28 @@ Class ScheduleController {
         for ($j = 0; $j<10; $j++) {
             echo '<tr>';
             echo '<td class="hour">';
-            $hour = $godziny[$j];
+            $hour = $hours[$j];
             echo $hour['start']."-".$hour['stop'];
             echo '</td>';
             for ($i = 1; $i < 6; $i++) {
                 //echo "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND nauczyciel = 17";
-                $lekcja = R::getAll( "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND nauczyciel = $teacher_id" );
+                $lesson = R::getAll( "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND nauczyciel = $teacher_id" );
                 echo '<td ckass="lesson">';
 
-                        $klasa_id = $lekcja[0]['klasa'];
+                        $klasa_id = $lesson[0]['klasa'];
                         echo '<a class="klasa">'.$klasa_id.'</a>';
 
-                        echo $lekcja[0]['przedmiot'];
+                        echo $lesson[0]['przedmiot'];
 
 
 
-                        $sala_id = $lekcja[0]['sala'];
-                        if($sala_id != "") {
-                            $sala = R::getAll( "SELECT * FROM sale WHERE legacy_id = $sala_id" );
-                            $sala_skrot =  $sala[0]['skrot'];
+                        $classroom_id = $lesson[0]['sala'];
+                        if($classroom_id != "") {
+                            $classroom = R::getAll( "SELECT * FROM sale WHERE legacy_id = $classroom_id" );
+                            $clasroom_shortcut =  $classroom[0]['skrot'];
 
-                            $sala_skrot = substr($sala_skrot, 0, 2);
-                            echo '<a class="sala">'.$sala_skrot."</a>";
+                            $clasroom_shortcut = substr($clasroom_shortcut, 0, 2);
+                            echo '<a class="sala">'.$clasroom_shortcut."</a>";
                         }
                         //$lekcja['nauczyciel'];
                         //echo $nauczyciele[(int)$lekcja['nauczyciel']]['skrot'];
@@ -134,9 +134,9 @@ Class ScheduleController {
      */
     public function getClassroomSchedule($classroom_id) {   
         // Przykladowe wyswietlanie planu dla sali 3
-        $godziny = R::getAll( 'SELECT * FROM godziny' );
-        $nauczyciele = R::getAll( 'SELECT * FROM nauczyciele' );
-        $sale = R::getAll( 'SELECT * FROM sale' );
+        $hours = R::getAll( 'SELECT * FROM godziny' );
+        $teachers = R::getAll( 'SELECT * FROM nauczyciele' );
+        $classrooms = R::getAll( 'SELECT * FROM sale' );
 
         echo '<table>';
         echo "<thead>";
@@ -154,28 +154,28 @@ Class ScheduleController {
         for ($j = 0; $j<10; $j++) {
             echo '<tr>';
             echo '<td class="hour">';
-            $hour = $godziny[$j];
+            $hour = $hours[$j];
             echo $hour['start']."-".$hour['stop'];
             echo '</td>';
             for ($i = 1; $i < 6; $i++) {
                 //echo "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND sala = 3";
-                $lekcja = R::getAll( "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND sala = $classroom_id" );
+                $lesson = R::getAll( "SELECT * FROM plan WHERE dzien = $i AND godzina = $j AND sala = $classroom_id" );
                 echo '<td ckass="lesson">';
 
-                        $klasa_id = $lekcja[0]['klasa'];
-                        echo '<a class="klasa">'.$klasa_id.'</a>';
+                        $class_id = $lesson[0]['klasa'];
+                        echo '<a class="klasa">'.$class_id.'</a>';
 
-                        echo $lekcja[0]['przedmiot'];
+                        echo $lesson[0]['przedmiot'];
 
-                        echo '<a class="nauczyciel">'.$lekcja[0]['nauczyciel'].'</a>';;
+                        echo '<a class="nauczyciel">'.$lesson[0]['nauczyciel'].'</a>';;
 
-                        $sala_id = $lekcja[0]['sala'];
-                        if($sala_id != "") {
-                            $sala = R::getAll( "SELECT * FROM sale WHERE legacy_id = $sala_id" );
-                            $sala_skrot =  $sala[0]['skrot'];
+                        $clasroom_id = $lesson[0]['sala'];
+                        if($clasroom_id != "") {
+                            $classroom = R::getAll( "SELECT * FROM sale WHERE legacy_id = $clasroom_id" );
+                            $classroom_shortcut =  $classroom[0]['skrot'];
 
-                            $sala_skrot = substr($sala_skrot, 0, 2);
-                            echo '<a class="sala">'.$sala_skrot."</a>";
+                            $classroom_shortcut = substr($classroom_shortcut, 0, 2);
+                            echo '<a class="sala">'.$classroom_shortcut."</a>";
                         }
                         //$lekcja['nauczyciel'];
                         //echo $nauczyciele[(int)$lekcja['nauczyciel']]['skrot'];
@@ -186,24 +186,33 @@ Class ScheduleController {
         echo '</table>';        
     }
     
+    /**
+     * Generate html list with links to teachers schedules
+     */
     public function getTeacherList() {
-        $nauczyciele = R::getAll( 'SELECT * FROM nauczyciele' );
-        foreach ($nauczyciele as $nauczyciel) {
-            echo "<a href='?type=teacher&id=".$nauczyciel['legacy_id']."'>".$nauczyciel['skrot']."</a><br>";
+        $teachers = R::getAll( 'SELECT * FROM nauczyciele' );
+        foreach ($teachers as $teacher) {
+            echo "<a href='?type=teacher&id=".$teacher['legacy_id']."'>".$teacher['skrot']."</a><br>";
         }
     }
     
+    /**
+     * Generate html list with links to classes schedules
+     */
     public function getClassList() {
-        $klasy = R::getAll( 'SELECT * FROM klasy' );
-        foreach ($klasy as $klasa) {
-            echo "<a href='?type=class&id=".$klasa['id']."'>".$klasa['nazwa']."</a><br>";
+        $classes = R::getAll( 'SELECT * FROM klasy' );
+        foreach ($classes as $class) {
+            echo "<a href='?type=class&id=".$class['id']."'>".$class['nazwa']."</a><br>";
         }
     }
     
+    /**
+     * Generate html list with links to classrooms schedules
+     */
     public function getClassroomList() {
-        $klasy = R::getAll( 'SELECT * FROM sale' );
-        foreach ($klasy as $klasa) {
-            echo "<a href='?type=classroom&id=".$klasa['legacy_id']."'>".$klasa['skrot']."</a><br>";
+        $classrooms = R::getAll( 'SELECT * FROM sale' );
+        foreach ($classrooms as $classroom) {
+            echo "<a href='?type=classroom&id=".$classroom['legacy_id']."'>".$classroom['skrot']."</a><br>";
         }
     }
 }

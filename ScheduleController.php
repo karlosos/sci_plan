@@ -220,4 +220,36 @@ class ScheduleController
             echo "<a href='?type=classroom&id=".$classroom['legacy_id']."'>".$classroom['skrot'].'</a><br>';
         }
     }
+
+    ///
+    /// JSON OUTPUT
+    ///
+
+    public function getClassScheduleJson($id)
+    {
+        $schedule = R::find('plan', "klasa =  $id");
+
+        return json_encode(R::exportAll($schedule));
+    }
+
+    public function getClassroomScheduleJson($id)
+    {
+        $schedule = R::find('plan', "sala =  $id");
+
+        return json_encode(R::exportAll($schedule));
+    }
+
+    public function getTeacherScheduleJson($id)
+    {
+        $schedule = R::find('plan', "nauczyciel =  $id");
+
+        return json_encode(R::exportAll($schedule));
+    }
+
+    public function getHoursListJson()
+    {
+        $hours = R::find('godziny');
+
+        return json_encode(R::exportAll($hours));
+    }
 }
